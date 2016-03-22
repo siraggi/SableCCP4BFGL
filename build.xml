@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project name="SableCCP4BFGL" default="dist" basedir=".">
+  <property name="src.dir" value="src"></property>
+  <property name="classes.dir" value="classes"></property>
+  <property name="grammar.dir" value="grammar"></property>
+  <property name="lib.jar" value="sableccp4bfgl.jar"></property>
+
+
+  <taskdef name="sablecc" classname="org.sablecc.ant.taskdef.Sablecc"></taskdef>
+
+  <target name="init">
+    <mkdir dir="${classes.dir}"></mkdir>
+  </target>
+  <target name="clean">
+    <delete dir="${classes.dir}"></delete>
+    <delete file="${lib.jar}"></delete>
+  </target>
+  <target name="precompile">
+    <echo message="Deleteing source directory: ${src.dir}/grammar/"></echo>
+    <delete dir="${src.dir}/grammar/"></delete>
+    <sablecc src="${grammar.dir}" includes="*.sablecc, *.grammar"
+             outputdirectory="${src.dir}"></sablecc>
+    <copy todir="${classes.dir}">
+      <fileset dir="${src.dir}">
+        <include name="**/*.dat"></include>
+        <include name="**/*.txt"></include>
+      </fileset>
+    </copy>
+  </target>
+  <target name="compile" depends="init, precompile">
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true"></javac>
+  </target>
+  <target name="dist" depends="compile">
+    <jar basedir="${classes.dir}" destfile="${lib.jar"></jar>
+  </target>
+</project>

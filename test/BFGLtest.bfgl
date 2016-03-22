@@ -1,0 +1,7 @@
+class Main begin
+    dcl num f to f.f.f.f.f.f.f()
+end
+
+class Object begin
+    dcl num t to true
+end

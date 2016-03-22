@@ -1,0 +1,253 @@
+Package grammar.ini;
+
+Helpers
+    letter = [['a' .. 'z'] + ['A' .. 'Z']];
+    digit = ['0' .. '9'] ;
+    tab=9; cr=13; lf=10; space = ' ';
+
+    any = [0..0xffff];
+
+
+
+Tokens
+    num = 'num';
+    bool = 'bool';
+    list = 'list';
+    text = 'text';
+    while = 'while';
+    for = 'for';
+    begin = 'begin';
+    end = 'end';
+    do = 'do';
+    if = 'if';
+    then = 'then';
+    else = 'else';
+    or = 'or';
+    and = 'and';
+    set = 'set';
+    dcl = 'dcl';
+    of = 'of';
+    to = 'to';
+    new = 'new';
+    func = 'func';
+    eclass = 'class';
+    main = 'Main';
+    upto = 'upto';
+    downto = 'downto';
+    boolval = 'true' | 'false';
+    is = 'is';
+    comma = ',';
+    dot = '.';
+    equals = '=';
+    notequals = '!=';
+    greater = '>';
+    less = '<';
+    greaterequals = '>=';
+    lessequals = '<=';
+    not = 'not';
+    treturn ='return';
+    minus = '-';
+    plus = '+';
+    divide = '/';
+    mult = '*';
+    mod = '%';
+    lparen = '(';
+    rparen = ')';
+    numval = '-'? digit*;
+    newline = (cr | lf | cr lf)+;
+    id = letter(letter|digit)*;
+    textval = '"' [any - '"']* '"';
+    blank = space*;
+    comment = '/' '*'[any - ['*' + '/']]* '*' '/';
+
+Ignored Tokens
+     blank,
+     comment;
+
+Productions
+    prog        {-> prog}   =   global* maindcl newline? classdcl*                      {-> New prog([global.pdcl], maindcl.pdcl, [classdcl.pdcl])};
+
+    global      {-> pdcl}   =   vardcl newline                                          {-> vardcl.pdcl};
+
+    maindcl     {-> pdcl}   =   {maindcl} eclass main begin newline classbody* end      {-> New pdcl.maindcl([classbody.body])};
+
+    classdcl    {-> pdcl}   =   {classdcl} [b]:newline eclass id inherit? begin [a]:newline classbody* end    {-> New pdcl.classdcl(id, [classbody.body])};
+
+    classbody   {-> body}   =   {dcl} vardcl newline                                                            {-> New body.class(vardcl.pdcl)}
+                            |   {funcdcl} dcl func id lparen formalparam? rparen begin funcbody end newline     {-> New body.class(New pdcl.func(id, [formalparam.param], funcbody.body))};
+
+    funcbody    {-> body}   =   newline stmt* return                                    {-> New body.func([stmt.stmt], return.return)};
+
+    return      {-> return} =   {returnid} treturn bexpr newline                        {-> New return.returnid(bexpr.expr)}
+                            |   {empty}                                                 {-> New return.empty()};
+
+
+    stmt        {-> stmt}   =   {vardcl} vardcl newline                                        {-> New stmt.vardcl(vardcl.pdcl)}
+                            |   {assignment} set id to bexpr newline                           {-> New stmt.assignment(id, bexpr.expr)}
+                            |   {forup} for id upto bexpr do [a]:newline stmt* end [b]:newline         {-> New stmt.forup(id, bexpr.expr, [stmt.stmt])}
+                            |   {fordown} for id downto bexpr do [a]:newline stmt* end [b]:newline     {-> New stmt.fordown(id, bexpr.expr, [stmt.stmt])}
+                            |   {while} while bexpr do [a]:newline stmt* end [b]:newline               {-> New stmt.while(bexpr.expr, [stmt.stmt])}
+                         //   |   {funccall} funccall newline                                    {-> New stmt.funccall(funccall.call)}
+                            |   {classcall} classcall newline                                  {-> New stmt.classcall(classcall.call)}
+                            |   {eventdcl} eventdcl newline                                    {-> New stmt.eventdcl(eventdcl.pdcl)}
+                            |   {ifstmt} ifstmt newline                                        {-> New stmt.ifstmt(ifstmt.ifstmt)};
+
+    vardcl      {-> pdcl}   =   {vardcl} dcl type id                                    {-> New pdcl.vardcl(type.type, id)}
+                            |   {vardclasg} dcl type id to bexpr                        {-> New pdcl.vardclasg(type.type, id, bexpr.expr)}
+                            |   {listdcl} dcl list of type id                           {-> New pdcl.listdcl(type.type, id)};
+
+    ifstmt      {-> ifstmt} =   if bexpr then newline stmt* elsestmt? end               {-> New ifstmt.if(bexpr.expr, [stmt.stmt], elsestmt.elsestmt)};
+
+    elsestmt    {-> elsestmt}=   {else} else newline stmt*                              {-> New elsestmt.else([stmt.stmt])}
+                             |   {elseif} else if bexpr then newline stmt* elsestmt?    {-> New elsestmt.elseif(bexpr.expr, [stmt.stmt], elsestmt.elsestmt)};
+
+
+    bexpr       {-> expr}   =   {or} bexpr or bterm                                     {-> New expr.or(bexpr.expr, bterm.expr)}
+                            |   {term} bterm                                            {-> bterm.expr};
+
+    bterm       {-> expr}   =   {and} bterm and notfactor                               {-> New expr.and(bterm.expr, notfactor.expr)}
+                            |   {factor} notfactor                                      {-> notfactor.expr};
+
+    notfactor   {-> expr}   =   {not} not bfactor                                       {-> New expr.not(bfactor.expr)}
+                            |   {factor} bfactor                                        {-> bfactor.expr};
+
+    bfactor     {-> expr}   =   {relation} relation                                     {-> relation.expr};
+
+    relation    {-> expr}   =   {equals} [left]:expression equals [right]:expression                {-> New expr.equals(left.expr, right.expr)}
+                            |   {notequals} [left]:expression notequals [right]:expression          {-> New expr.notequals(left.expr, right.expr)}
+                            |   {greater} [left]:expression greater [right]:expression              {-> New expr.greater(left.expr, right.expr)}
+                            |   {less} [left]:expression less [right]:expression                    {-> New expr.less(left.expr, right.expr)}
+                            |   {greaterequals} [left]:expression greaterequals [right]:expression  {-> New expr.greaterequals(left.expr, right.expr)}
+                            |   {lessequals} [left]:expression lessequals [right]:expression        {-> New expr.lessequals(left.expr, right.expr)}
+                            |   {unarymin} minus expression                                         {-> New expr.unary(expression.expr)}
+                            |   {expression} expression                                             {-> expression.expr};
+
+    expression  {-> expr}   =   {minus} [left]:expression minus [right]:term            {-> New expr.minus(left.expr, right.expr)}
+                            |   {plus} [left]:expression plus [right]:term              {-> New expr.plus(left.expr, right.expr)}
+                            |   {term} term                                             {-> term.expr};
+
+    term        {-> expr}   =   {divide} [left]:term divide [right]:factor              {-> New expr.divide(left.expr, right.expr)}
+                            |   {mult} [left]:term mult [right]:factor                  {-> New expr.mult(left.expr, right.expr)}
+                            |   {mod} [left]:term mod [right]:factor                    {-> New expr.mod(left.expr, right.expr)}
+                            |   {factor} factor                                         {-> factor.expr};
+
+    factor      {-> expr}   =   {value} val                                             {-> New expr.val(val.val)}
+                            |   {var} id                                                {-> New expr.id(id)}
+                            //|   {func} funccall                                         {-> New expr.call(funccall.call)}
+                            |   {classcall} classcall                                   {-> New expr.call(classcall.call)}
+                            |   {parenexpr}lparen bexpr rparen                          {-> bexpr.expr};
+
+    type        {-> type}   =   {num} num                                               {-> New type.num(num)}
+                            |   {bool} bool                                             {-> New type.bool(bool)}
+                            |   {text} text                                             {-> New type.text(text)}
+                            |   {object} id                                             {-> New type.object(id)};
+
+    val         {-> val}    =   {numliteral} numval                                     {-> New val.num(numval)}
+                            |   {textliteral} textval                                   {-> New val.text(textval)}
+                            |   {boolliteral} boolval                                   {-> New val.bool(boolval)}
+                            |   {newobject} new id lparen actualparam? rparen           {-> New val.constr(id, [actualparam.expr])};
+
+    funccall    {-> call}   =   {singlefunc} id lparen actualparam? rparen              {-> New call.funcsingle(id, [actualparam.expr])};
+                    //        |   {nestedfunc} eclass id lparen actualparam? rparen dot funccall {-> New call.funcmulti(id, [actualparam.expr], funccall.call)};
+
+    actualparam {-> expr*}  =   {singleparam} bexpr                                     {-> [bexpr.expr]}
+                            |   {mulparam} bexpr comma [rest]:actualparam               {-> [bexpr.expr, rest.expr]};
+
+    formalparam {-> param}  =   {singleparam} type id                                   {-> New param.formal(type.type, id, [])}
+                            |   {mulparam} type id comma formalparam                    {-> New param.formal(type.type, id, [formalparam.param])};
+
+    classcall   {-> call}   =   {mulcall}singlecall dot multicall                               {-> New call.classmulti(singlecall.call, [multicall.call])}
+                            |   {single} funccall                                       {-> funccall.call};
+
+    singlecall  {-> call}   =   {idcall} id                                             {-> New call.var(id)}
+                            |   {funccall} funccall                                     {-> funccall.call};
+
+    multicall   {-> call*}  =   {signle} singlecall                                     {-> [singlecall.call]}
+                            |   {multi} singlecall dot [rest]:multicall                 {-> [singlecall.call, rest.call]};
+
+    inherit     {-> inherit}    =    is type                                            {-> New inherit(type)};
+
+    eventdcl    {-> pdcl}  =   id lparen formalparam* rparen do newline [body]:stmt* end          {-> New pdcl.eventdcl(id, [formalparam.param], [body.stmt])};
+
+
+Abstract Syntax Tree
+
+    prog        =   [globaldcl]:pdcl* [maindcl]:pdcl [classdcl]:pdcl*;
+
+    pdcl        =   {vardcl} type id
+                |   {vardclasg} type id expr
+                |   {listdcl} type id
+                |   {classdcl} id body*
+                |   {maindcl} body*
+                |   {eventdcl} id [params]:param* [body]:stmt*
+                |   {func} id [params]:param* body;
+
+    body        =   {func} stmt* return
+                |   {class} pdcl;
+
+    return      =   {returnid} expr
+                |   {empty} ;
+
+    param       =   {formal} type id param*;
+
+    inherit     =   type;
+
+    type        =   {num} num
+                |   {bool} bool
+                |   {text} text
+                |   {object} id;
+
+    loop        =   {while} expr stmt*
+                |   {forup} id [start]:val [finish]:val stmt*
+                |   {fordown} id [start]:val [finish]:val stmt*;
+
+    ifelse      =   {if} expr stmt*
+                |   {else} stmt*;
+
+    call        =   {funcsingle} id [params]:expr*
+                |   {funcmulti} id [params]:expr* call
+                |   {classsingle} id call
+                |   {classmulti} [first]:call [rest]:call*
+                |   {constrcall} id [params]:expr*
+                |   {val} val
+                |   {var} id;
+
+    expr        =   {minus} [left]:expr [right]:expr
+                |   {plus} [left]:expr [right]:expr
+                |   {divide} [left]:expr [right]:expr
+                |   {mult} [left]:expr [right]:expr
+                |   {mod} [left]:expr [right]:expr
+                |   {relop} [left]:expr [right]:expr
+                |   {or} [left]:expr [right]:expr
+                |   {and} [left]:expr [right]:expr
+                |   {equals} [left]:expr [right]:expr
+                |   {notequals} [left]:expr [right]:expr
+                |   {greater} [left]:expr [right]:expr
+                |   {less} [left]:expr [right]:expr
+                |   {greaterequals} [left]:expr [right]:expr
+                |   {lessequals} [left]:expr [right]:expr
+                |   {unary} expr
+                |   {not} expr
+                |   {val} val
+                |   {call} call
+                |   {id} id;
+
+    val         =   {num} numval
+                |   {text} textval
+                |   {bool} boolval
+                |   {constr} id [param]:expr*;
+
+    stmt        =   {vardcl} pdcl
+                |   {assignment} id expr
+                |   {forup} id expr stmt*
+                |   {fordown} id expr stmt*
+                |   {while} expr stmt*
+                |   {ifstmt} ifstmt
+                |   {funccall} call
+                |   {classcall} call
+                |   {eventdcl} pdcl;
+
+    ifstmt      =   {if} expr stmt* elsestmt?;
+
+    elsestmt    =   {else} stmt*
+                |   {elseif} expr stmt* elsestmt?;
