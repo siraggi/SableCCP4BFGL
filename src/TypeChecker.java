@@ -5,5 +5,4 @@ import grammar.ini.analysis.*;
 
 public class TypeChecker extends DepthFirstAdapter{
     //hej september
-    
 }
