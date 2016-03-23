@@ -1,10 +1,15 @@
+dcl num f
+
 class Main begin
-    dcl num f to f.f.f.f.f.f.f()
-    dcl func f() begin
-    set x to 5 + "hello"
+
+    dcl func x(text s) begin
+        dcl num v
+        return v
     end
+
+
 end
 
-class Object begin
-    dcl num t to true
+class Player begin
+
 end

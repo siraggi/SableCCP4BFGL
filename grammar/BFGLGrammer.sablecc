@@ -53,7 +53,7 @@ Tokens
     mod = '%';
     lparen = '(';
     rparen = ')';
-    numval = digit*;
+    numval = digit* ('.' digit*)?;
     newline = (cr | lf | cr lf)+;
     id = letter(letter|digit)*;
     textval = '"' [any - '"']* '"';
@@ -78,7 +78,7 @@ Productions
 
     funcbody    {-> body}   =   newline stmt* return                                    {-> New body.func([stmt.stmt], return.return)};
 
-    return      {-> return} =   {returnid} treturn bexpr newline                        {-> New return.returnid(bexpr.expr)}
+    return      {-> return} =   {returnid} treturn bexpr newline                        {-> New return.id(bexpr.expr)}
                             |   {empty}                                                 {-> New return.empty()};
 
 
@@ -90,16 +90,16 @@ Productions
                          //   |   {funccall} funccall newline                                    {-> New stmt.funccall(funccall.call)}
                             |   {classcall} classcall newline                                  {-> New stmt.classcall(classcall.call)}
                             |   {eventdcl} eventdcl newline                                    {-> New stmt.eventdcl(eventdcl.pdcl)}
-                            |   {ifstmt} ifstmt newline                                        {-> New stmt.ifstmt(ifstmt.ifstmt)};
+                            |   {ifstmt} ifstmt newline                                        {-> New stmt.if(ifstmt.conditional)};
 
     vardcl      {-> pdcl}   =   {vardcl} dcl type id                                    {-> New pdcl.var(type.type, id)}
-                            |   {vardclasg} dcl type id to bexpr                        {-> New pdcl.vardclasg(type.type, id, bexpr.expr)}
+                            |   {vardclasg} dcl type id to bexpr                        {-> New pdcl.varasg(type.type, id, bexpr.expr)}
                             |   {listdcl} dcl list of type id                           {-> New pdcl.list(type.type, id)};
 
-    ifstmt      {-> ifstmt} =   if bexpr then newline stmt* elsestmt? end               {-> New ifstmt.if(bexpr.expr, [stmt.stmt], elsestmt.elsestmt)};
+    ifstmt      {-> conditional} =   if bexpr then newline stmt* elsestmt? end               {-> New conditional.if(bexpr.expr, [stmt.stmt], elsestmt.branch)};
 
-    elsestmt    {-> elsestmt}=   {else} else newline stmt*                              {-> New elsestmt.else([stmt.stmt])}
-                             |   {elseif} else if bexpr then newline stmt* elsestmt?    {-> New elsestmt.elseif(bexpr.expr, [stmt.stmt], elsestmt.elsestmt)};
+    elsestmt    {-> branch}=   {else} else newline stmt*                              {-> New branch.else([stmt.stmt])}
+                             |   {elseif} else if bexpr then newline stmt* elsestmt?    {-> New branch.elseif(bexpr.expr, [stmt.stmt], elsestmt.branch)};
 
 
     bexpr       {-> expr}   =   {or} bexpr or bterm                                     {-> New expr.or(bexpr.expr, bterm.expr)}
@@ -156,7 +156,7 @@ Productions
     formalparam {-> param}  =   {singleparam} type id                                   {-> New param.formal(type.type, id, [])}
                             |   {mulparam} type id comma formalparam                    {-> New param.formal(type.type, id, [formalparam.param])};
 
-    classcall   {-> call}   =   {mulcall}singlecall dot multicall                               {-> New call.classmulti(singlecall.call, [multicall.call])}
+    classcall   {-> call}   =   {mulcall}singlecall dot multicall                               {-> New call.class(singlecall.call, [multicall.call])}
                             |   {single} funccall                                       {-> funccall.call};
 
     singlecall  {-> call}   =   {idcall} id                                             {-> New call.var(id)}
@@ -175,7 +175,7 @@ Abstract Syntax Tree
     prog        =   [globaldcl]:pdcl* [maindcl]:pdcl [classdcl]:pdcl*;
 
     pdcl        =   {var} type id
-                |   {vardclasg} type id expr
+                |   {varasg} type id expr
                 |   {list} type id
                 |   {class} id body*
                 |   {main} body*
@@ -185,7 +185,7 @@ Abstract Syntax Tree
     body        =   {func} stmt* return
                 |   {class} pdcl;
 
-    return      =   {returnid} expr
+    return      =   {id} expr
                 |   {empty} ;
 
     param       =   {formal} type id param*;
@@ -197,13 +197,8 @@ Abstract Syntax Tree
                 |   {text} text
                 |   {object} id;
 
-    ifelse      =   {if} expr stmt*
-                |   {else} stmt*;
-
     call        =   {func} id [params]:expr*
-                |   {classsingle} id call
-                |   {classmulti} [first]:call [rest]:call*
-                |   {constrcall} id [params]:expr*
+                |   {class} [first]:call [rest]:call*
                 |   {val} val
                 |   {var} id;
 
@@ -237,12 +232,12 @@ Abstract Syntax Tree
                 |   {forup} id expr stmt*
                 |   {fordown} id expr stmt*
                 |   {while} expr stmt*
-                |   {ifstmt} ifstmt
+                |   {if} conditional
                 |   {funccall} call
                 |   {classcall} call
                 |   {eventdcl} pdcl;
 
-    ifstmt      =   {if} expr stmt* elsestmt?;
+    conditional  =   {if} expr stmt* branch?;
 
-    elsestmt    =   {else} stmt*
-                |   {elseif} expr stmt* elsestmt?;
+    branch      =   {else} stmt*
+                |   {elseif} expr stmt* branch?;
