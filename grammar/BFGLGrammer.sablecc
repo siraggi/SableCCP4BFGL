@@ -207,7 +207,6 @@ Abstract Syntax Tree
                 |   {divide} [left]:expr [right]:expr
                 |   {mult} [left]:expr [right]:expr
                 |   {mod} [left]:expr [right]:expr
-                |   {relop} [left]:expr [right]:expr
                 |   {or} [left]:expr [right]:expr
                 |   {and} [left]:expr [right]:expr
                 |   {equals} [left]:expr [right]:expr

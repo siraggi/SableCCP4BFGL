@@ -13,12 +13,13 @@ public class TypeChecker extends DepthFirstAdapter{
     private static final String NUM = "num";
     private static final String TEXT = "text";
     private static final String VECTOR = "vector";
+    private static final String ERRORTYPE = "9";
 
     // Stack of symbol tables with name as key and type as value
     public Stack<Hashtable<String, Node>> symStack;
     public Hashtable<Node, String> typeTable;
     public ArrayList<String> ErrorList;
-    private TypeChecker typeChecker;
+
 
 
 
@@ -67,6 +68,7 @@ public class TypeChecker extends DepthFirstAdapter{
     }
 
     private String getType(String id){
+        TypeChecker typeChecker;
         String type = "";
         AFuncPdcl tempNode;
 
@@ -95,7 +97,7 @@ public class TypeChecker extends DepthFirstAdapter{
             }
         }
 
-        if(type == "")
+        if(type.equals(""))
             ErrorList.add("ERROR: " + id + " is not in scope");
 
         return type;
@@ -237,19 +239,19 @@ public class TypeChecker extends DepthFirstAdapter{
 
     //Value types
     public void outANumVal(ANumVal node){
-        typeTable.put(node, "num");
+        typeTable.put(node, NUM);
     }
 
     public void outATextVal(ATextVal node){
-        typeTable.put(node, "text");
+        typeTable.put(node, TEXT);
     }
 
     public void outABoolVal(ABoolVal node){
-        typeTable.put(node, "bool");
+        typeTable.put(node, BOOL);
     }
 
     public void outAConstrVal(AConstrVal node){
-        if(getType(node.getId().getText()) != "")
+        if(!getType(node.getId().getText()).equals(""))
             typeTable.put(node, node.getId().getText());
     }
 
@@ -296,16 +298,221 @@ public class TypeChecker extends DepthFirstAdapter{
     
     //Expr
     public void outANotExpr(ANotExpr node){
-       if(typeTable.get(node) == "bool")
-           typeTable.put(node, "bool");
-        else
-           ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type BOOL.");
+       if(typeTable.get(node).equals(BOOL))
+           typeTable.put(node, BOOL);
+       else{
+           ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
+           typeTable.put(node, ERRORTYPE);
+       }
     }
 
     public void outAUnaryExpr(AUnaryExpr node){
-        if(typeTable.get(node) == "num")
-            typeTable.put(node, "num");
-        else
-            ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type NUM.");
+        if(typeTable.get(node.getExpr()).equals(NUM))
+            typeTable.put(node, NUM);
+        else{
+            ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+
+    }
+
+    public void outALessequalsExpr(ALessequalsExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAGreaterequalsExpr(AGreaterequalsExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outALessExpr(ALessExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAGreaterExpr(AGreaterExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outANotequalsExpr(ANotequalsExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAEqualsExpr(AEqualsExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAAndExpr(AAndExpr node){
+        if(typeTable.get(node.getLeft()).equals(BOOL)){
+            if(typeTable.get(node.getRight()).equals(BOOL)){
+                typeTable.put(node, BOOL);
+            }
+            else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + BOOL + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + BOOL + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAOrExpr(AOrExpr node){
+        if(typeTable.get(node.getLeft()).equals(BOOL)){
+            if(typeTable.get(node.getRight()).equals(BOOL)){
+                typeTable.put(node, BOOL);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + BOOL + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + BOOL + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAModExpr(AModExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, NUM);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAMultExpr(AMultExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, NUM);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outADivideExpr(ADivideExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, NUM);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAPlusExpr(APlusExpr node){
+        if(typeTable.get(node.getLeft()).equals(TEXT) || typeTable.get(node.getRight()).equals(TEXT)){
+            typeTable.put(node, TEXT);
+        }
+        else if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, NUM);
+            }
+            else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAMinusExpr(AMinusExpr node){
+        if(typeTable.get(node.getLeft()).equals(NUM)){
+            if(typeTable.get(node.getRight()).equals(NUM)){
+                typeTable.put(node, NUM);
+            }else{
+                ErrorList.add("ERROR: " + node.getRight().toString() + ", is not of type " + NUM + ".");
+                typeTable.put(node, ERRORTYPE);
+            }
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
     }
 }

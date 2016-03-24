@@ -4,6 +4,8 @@ class Main begin
 
     dcl func y(text s) begin
         x()
+
+        return (true<(40 % 7)) and (5 = 5)
     end
 
     dcl func x() begin
