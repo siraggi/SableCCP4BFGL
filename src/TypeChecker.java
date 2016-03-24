@@ -9,6 +9,10 @@ import java.util.Hashtable;
 import java.util.Stack;
 
 public class TypeChecker extends DepthFirstAdapter{
+    private static final String BOOL = "bool";
+    private static final String NUM = "num";
+    private static final String TEXT = "text";
+    private static final String VECTOR = "vector";
 
     // Stack of symbol tables with name as key and type as value
     public Stack<Hashtable<String, Node>> symStack;
@@ -289,7 +293,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outACallExpr(ACallExpr node){
         typeTable.put(node, typeTable.get(node.getCall()));
     }
-
+    
     //Expr
     public void outANotExpr(ANotExpr node){
        if(typeTable.get(node) == "bool")
@@ -304,6 +308,4 @@ public class TypeChecker extends DepthFirstAdapter{
         else
             ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type NUM.");
     }
-
-
 }
