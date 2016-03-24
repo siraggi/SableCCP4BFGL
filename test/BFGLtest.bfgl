@@ -2,11 +2,13 @@ dcl num f
 
 class Main begin
 
-    dcl func x(text s) begin
-        dcl num v
-        return v
+    dcl func y(text s) begin
+        x()
     end
 
+    dcl func x() begin
+        set f to new Player()
+    end
 
 end
 
