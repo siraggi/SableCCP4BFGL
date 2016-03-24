@@ -18,8 +18,8 @@ public class Main {
         PushbackReader pushbackReader = new PushbackReader(new FileReader(file));
         Parser parser = new Parser(new Lexer(pushbackReader));
         Start tree = parser.parse();
-        tree.apply(new TypeChecker());
-        //System.out.println("CSTTree..........\n" + tree.toString());
+        //tree.apply(new TypeChecker());
+        System.out.println("CSTTree..........\n" + tree.toString());
 
 
 
