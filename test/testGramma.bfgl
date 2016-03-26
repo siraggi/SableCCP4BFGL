@@ -1,0 +1,42 @@
+dcl num NumTest to 5
+dcl bool BoolTest
+dcl text TextTest
+dcl someClass ClassTest
+
+class Main begin /* skal vi vaere i stand til at set var? */
+   dcl num NumTest to 5 /*main passer generalt ikke med hvad der skrivet i rapporten */
+   dcl bool BoolTest
+   dcl text TextTest
+   dcl someClass ClassTest
+end
+
+class SomeClass begin
+   dcl num NumTest to 5 
+   dcl bool BoolTest
+   dcl text TextTest
+   dcl someClass ClassTest
+
+   dcl func x() begin
+      dcl num NumTest to 5 
+      dcl bool BoolTest
+      dcl text TextTest
+      dcl someClass ClassTest
+
+      set numTest to 5
+      set BoolTest to true
+      set TextTest to "test"
+      set ClassTest to new someClass()
+
+      if point.y > ball.point.y then /* hvorfor virker dette */
+      end
+      if some > some do /* men ikke dette? */
+      end
+
+      for i upto something then
+         for i upto something then
+            if point.y > ball.point.y then /* hvorfor virker dette */
+            end
+         end
+      end
+   end
+end
