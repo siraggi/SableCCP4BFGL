@@ -1,0 +1,79 @@
+class Main begin /* Gramma der magler. paa google doc har de ting fandt der magler */
+    dcl Player player to new Player() 
+    dcl Ball ball to new Ball()
+    dcl Enemy enemy to new Enemy() /* Cant place comment on emety line */
+end
+
+class Player is Sprite begin
+  dcl num speed
+
+  dcl func OnConstruct() begin /* kan ikke faa event til at virke */
+     base(new Point(20, Game.height /2), "/Textures/player.png")
+     Game.sprites.add(this)             
+     set speed to 20
+  end
+
+  dcl func funcOnInput(Input key) begin                       /* A event as explained in the previous section       */
+     set velocity to 0 /* har problemer med else, og kan ikke sige velocity.y */
+     if key.IsKeyPress(Key.w) then
+        set y to -speed 
+     end
+
+     if key.IsKeyPress(Key.s) then
+        set velocity to speed 
+     end
+  end
+end
+
+class Enemy is Sprite begin
+  dcl num speed
+  dcl Ball ball
+
+  dcl func OnConstruct() begin /* kan ikke faa event til at virke */
+      base(new Point(Game.width-20, Game.height /2), "/Textures/enemy.png")
+      Game.sprites.add(this)
+      set speed to 20
+      for i upto Game.sprite.count do        /* Find the ball ball so that we have a reference to it. */
+         if Game.sprite.get(i).equal(Ball) then
+            set ball to Game.sprite.get(i)
+         end
+      end
+  end
+
+  dcl func funcOnInput(Input key) begin                       /* A event as explained in the previous section       */
+     if point.y < ball.point.y then              /* Use the reference obtained earlier, to move the enemy accordingly */
+        set velocity to speed
+     end
+     if point.y > ball.point.y then
+        set velocity to -speed
+     end
+  end
+end
+
+class Ball is Sprite begin
+  dcl num speed
+
+  dcl func OnConstruct() begin
+     base(new Point(Game.width / 2.0, Game.height / 2.0), "/Textures/ball.png")
+     Game.sprites.add(this)
+     set speed to 20
+     dcl num rand to math.GetRandomNum(0, 0.4)       
+     set velocity to new velocity(1.0-rand, rand)
+     set velocity to velocity*speed              
+  end
+
+  dcl func OnCollision(sprite other) begin
+     set speed to speed+1                      
+     set velocity to 5 
+  end
+
+  dcl func OnUpdate() begin
+    if point.y < 0 or point.y > Game.height then
+      set speed to speed                      
+      set velocityy to 1 
+    end
+  end
+end
+
+class Ball is Sprite begin /*For en fejl vis jeg har den her tome class */
+end
