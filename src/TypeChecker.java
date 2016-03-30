@@ -9,10 +9,10 @@ import java.util.Hashtable;
 import java.util.Stack;
 
 public class TypeChecker extends DepthFirstAdapter{
-    private static final String BOOL = "bool";
-    private static final String NUM = "num";
-    private static final String TEXT = "text";
-    private static final String VECTOR = "vector";
+    private static final String BOOL = "bool ";
+    private static final String NUM = "num ";
+    private static final String TEXT = "text ";
+    private static final String VECTOR = "vector ";
     private static final String ERRORTYPE = "9";
 
     // Stack of symbol tables with name as key and type as value
@@ -94,6 +94,8 @@ public class TypeChecker extends DepthFirstAdapter{
 
                     type = typeTable.get(symStack.get(i-1).get(id));
                 }
+
+                break;
             }
         }
 
@@ -151,11 +153,14 @@ public class TypeChecker extends DepthFirstAdapter{
     //Function dcl
     public void inAFuncPdcl(AFuncPdcl node){
         openScope(node);
+
+        for (Node n : node.getParams()){
+            addSymbol(((AFormalParam) n).getId().getText(), n, ((AFormalParam) n).getType().toString());
+        }
     }
 
     public void outAFuncPdcl(AFuncPdcl node){
         closeScope();
-        //addSymbol(node.getId().getText(), node, typeTable.get(node.getBody()));
     }
 
     //For loop up
@@ -192,6 +197,10 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAIfConditional(AIfConditional node){
         closeScope();
+
+        if(!typeTable.get(node.getExpr()).equals(BOOL)){
+            ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
+        }
     }
 
     //else
@@ -210,6 +219,10 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAElseifBranch(AElseifBranch node){
         closeScope();
+
+        if(!typeTable.get(node.getExpr()).equals(BOOL)){
+            ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
+        }
     }
 
     //Event dcl
@@ -229,7 +242,13 @@ public class TypeChecker extends DepthFirstAdapter{
 
     //Var asg dcl
     public void outAVarasgPdcl(AVarasgPdcl node){
-        addSymbol(node.getId().getText(), node, node.getType().toString());
+        if(typeTable.get(node.getExpr()).trim().equals(node.getType().toString().trim())){
+            addSymbol(node.getId().getText(), node, node.getType().toString());
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getExpr().toString() + ", is not of type " + node.getType() + ".");
+            addSymbol(node.getId().getText(), node, ERRORTYPE);
+        }
     }
 
     //List dcl
@@ -251,8 +270,8 @@ public class TypeChecker extends DepthFirstAdapter{
     }
 
     public void outAConstrVal(AConstrVal node){
-        if(!getType(node.getId().getText()).equals(""))
-            typeTable.put(node, node.getId().getText());
+
+        typeTable.put(node, node.getId().getText());
     }
 
     public void outAValExpr(AValExpr node){
@@ -514,5 +533,28 @@ public class TypeChecker extends DepthFirstAdapter{
             ErrorList.add("ERROR: " + node.getLeft().toString() + ", is not of type " + NUM + ".");
             typeTable.put(node, ERRORTYPE);
         }
+    }
+
+    //Stmt
+    public void outAAssignmentStmt(AAssignmentStmt node){
+        if(getType(node.getId().getText()).equals(typeTable.get(node.getExpr()))){
+            typeTable.put(node, getType(node.getId().getText()));
+        }
+        else{
+            ErrorList.add("ERROR: " + node.getId().getText() + ", is not of type " + typeTable.get(node.getId()) + ".");
+            typeTable.put(node, ERRORTYPE);
+        }
+    }
+
+    public void outAClasscallStmt(AClasscallStmt node){
+        typeTable.put(node, typeTable.get(node.getCall()));
+    }
+
+    public void outAFunccallStmt(AFunccallStmt node){
+        typeTable.put(node, typeTable.get(node.getCall()));
+    }
+
+    public void outAVardclStmt(AVardclStmt node){
+        typeTable.put(node, typeTable.get(node.getPdcl()));
     }
 }

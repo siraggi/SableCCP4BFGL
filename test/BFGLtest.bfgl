@@ -3,8 +3,9 @@ dcl num f
 Main begin
 
 dcl Player p to new Player()
+dcl text t to "hello"
 p.setY(5)
-dcl num x to p.y
+dcl num x to p
 end
 
 class Player begin
