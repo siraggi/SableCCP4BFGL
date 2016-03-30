@@ -54,7 +54,7 @@ Tokens
     lparen = '(';
     rparen = ')';
     numval = digit* ('.' digit*)?;
-    newline = (cr | lf | cr lf)+;
+    newline = (cr | lf | cr lf) (space | (cr | lf | cr lf) | ('/' '*'[any - ['*' + '/']]* '*' '/'))*;
     id = letter(letter|digit)*;
     textval = '"' [any - '"']* '"';
     blank = space*;
@@ -69,11 +69,12 @@ Productions
 
     global      {-> pdcl}   =   vardcl newline                                          {-> vardcl.pdcl};
 
-    maindcl     {-> pdcl}   =   {maindcl} eclass main begin newline classbody* end      {-> New pdcl.main([classbody.body])};
+    maindcl     {-> pdcl}   =   {maindcl} main begin newline stmt* end           {-> New pdcl.main([stmt.stmt])};
 
     classdcl    {-> pdcl}   =   {classdcl} [b]:newline eclass id inherit? begin [a]:newline classbody* end    {-> New pdcl.class(id, [classbody.body])};
 
     classbody   {-> body}   =   {dcl} vardcl newline                                                            {-> New body.class(vardcl.pdcl)}
+                            |   {eventdcl} eventdcl newline                                                     {-> New body.eventdcl(eventdcl.pdcl)}
                             |   {funcdcl} dcl func id lparen formalparam? rparen begin funcbody end newline     {-> New body.class(New pdcl.func(id, [formalparam.param], funcbody.body))};
 
     funcbody    {-> body}   =   newline stmt* return                                    {-> New body.func([stmt.stmt], return.return)};
@@ -89,7 +90,6 @@ Productions
                             |   {while} while bexpr do [a]:newline stmt* end [b]:newline               {-> New stmt.while(bexpr.expr, [stmt.stmt])}
                          //   |   {funccall} funccall newline                                    {-> New stmt.funccall(funccall.call)}
                             |   {classcall} classcall newline                                  {-> New stmt.classcall(classcall.call)}
-                            |   {eventdcl} eventdcl newline                                    {-> New stmt.eventdcl(eventdcl.pdcl)}
                             |   {ifstmt} ifstmt newline                                        {-> New stmt.if(ifstmt.conditional)};
 
     vardcl      {-> pdcl}   =   {vardcl} dcl type id                                    {-> New pdcl.var(type.type, id)}
@@ -178,11 +178,12 @@ Abstract Syntax Tree
                 |   {varasg} type id expr
                 |   {list} type id
                 |   {class} id body*
-                |   {main} body*
+                |   {main} stmt*
                 |   {event} id [params]:param* [body]:stmt*
                 |   {func} id [params]:param* body;
 
     body        =   {func} stmt* return
+                |   {eventdcl} pdcl
                 |   {class} pdcl;
 
     return      =   {id} expr
@@ -233,8 +234,8 @@ Abstract Syntax Tree
                 |   {while} expr stmt*
                 |   {if} conditional
                 |   {funccall} call
-                |   {classcall} call
-                |   {eventdcl} pdcl;
+                |   {classcall} call;
+
 
     conditional  =   {if} expr stmt* branch?;
 

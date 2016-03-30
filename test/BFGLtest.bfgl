@@ -1,19 +1,18 @@
 dcl num f
 
-class Main begin
+Main begin
 
-    dcl func y(text s) begin
-        x()
-
-        return (true<(40 % 7)) and (5 = 5)
-    end
-
-    dcl func x() begin
-        set f to new Player()
-    end
-
+dcl Player p to new Player()
+p.setY(5)
+dcl num x to p.y
 end
 
 class Player begin
+
+    dcl num y
+
+    dcl func setY(num val) begin
+        set y to val
+    end
 
 end
