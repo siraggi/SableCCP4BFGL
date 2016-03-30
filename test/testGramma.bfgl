@@ -1,10 +1,10 @@
-dcl num NumTest to 5
+dcl num NumTest to 5 /*Here har vi vores global var */
 dcl bool BoolTest
 dcl text TextTest
 dcl someClass ClassTest
-
-class Main begin /* skal vi vaere i stand til at set var? */
-   dcl num NumTest to 5 /*main passer generalt ikke med hvad der skrivet i rapporten */
+                     /*du kan ogsaa lave c
+Main begin 
+   dcl num NumTest to 5 
    dcl bool BoolTest
    dcl text TextTest
    dcl someClass ClassTest
@@ -29,12 +29,20 @@ class SomeClass begin
 
       if point.y > ball.point.y then /* hvorfor virker dette */
       end
-      if some > some do /* men ikke dette? */
+      if some > somde then
       end
 
-      for i upto something then
-         for i upto something then
+      for i upto something do
+         for i upto something do
             if point.y > ball.point.y then /* hvorfor virker dette */
+            end
+         end
+      end
+      
+      while i < something do
+         while true do
+            if something = somethingelse then
+            else
             end
          end
       end
