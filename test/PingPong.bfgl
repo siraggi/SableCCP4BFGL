@@ -33,14 +33,14 @@ class Enemy is Sprite begin
     base(new Point(Game.width-20, Game.height /2), "/Textures/enemy.png")
     Game.sprites.add(this)
     set speed to dclspeed
-    for i upto Game.sprite.count do               /* Find the ball ball so that we have a reference to it. */
+    for i upto Game.sprite.count do               /* Find the Ball ball so that we have a reference to it. */
       if Game.sprite.get(i).equal(Ball) then
         set ball to Game.sprite.get(i)            /* This reference is used in OnUpdate */
       end
     end
   end
 
-  funcOnInput(Input key) do                       /* A event as explained in the previous section       */
+  OnInput(Input key) do                           /* A event as explained in the previous section       */
     if point.y < ball.point.y then                /* Use the reference obtained earlier, to move the enemy accordingly */
       velocity.SetY(speed)
     end
@@ -64,8 +64,8 @@ class Ball is Sprite begin
 
   OnCollision(sprite other) do
     set speed to speed+1                          /* Make the ball faster every time it hit something */                   
-    set velocity to (Vector.Normilise(other.center - center)*speed) 
-                                                  /* Make a direction vector and normelise it to move */
+    set velocity to (Vector.Normalise(other.center - center)*speed)
+                                                  /* Make a direction vector and normalise it to move */
                                                   /* from what we hit.                                */
   end
 
