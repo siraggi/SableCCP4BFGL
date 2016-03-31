@@ -14,11 +14,17 @@ public class Main {
     public static void main(String[] args)
     throws ParserException, LexerException, IOException
     {
+        TypeChecker typeChecker = new TypeChecker();
         File file = new File("test", "BFGLtest.bfgl");
         PushbackReader pushbackReader = new PushbackReader(new FileReader(file));
         Parser parser = new Parser(new Lexer(pushbackReader));
         Start tree = parser.parse();
-        tree.apply(new TypeChecker());
+        tree.apply(typeChecker);
+
+
+        for (String s: typeChecker.ErrorList)
+            System.out.println(s);
+
         //System.out.println("CSTTree..........\n" + tree.toString());
 
 

@@ -1,19 +1,16 @@
-dcl num f
-
 Main begin
+    dcl Player p to new Player()
 
-dcl Player p to new Player()
-dcl text t to "hello"
-p.setY(5)
-dcl num x to p
+    p.t.g
 end
 
 class Player begin
+    dcl Test t
 
-    dcl num y
 
-    dcl func setY(num val) begin
-        set y to val
     end
+end
 
+class Test begin
+    dcl num g
 end
