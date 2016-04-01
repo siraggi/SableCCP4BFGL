@@ -1,14 +1,13 @@
 Main begin
     dcl Player p to new Player()
-
-    p.t.g
+    if 5 = 5 then
+        p.t.g
+    end
 end
 
 class Player begin
     dcl Test t
 
-
-    end
 end
 
 class Test begin

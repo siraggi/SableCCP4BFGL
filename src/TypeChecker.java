@@ -569,4 +569,29 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAVardclStmt(AVardclStmt node){
         addType(node, typeTable.get(node.getPdcl()));
     }
+
+    //Inherit
+    public void outAInherit(AInherit node){
+        //Implement later
+    }
+
+
+    //Type - Not necessary
+    /*public void outABoolType(ABoolType node){
+        addType(node, BOOL);
+    }
+
+    public void outANumType(ANumType node){
+        addType(node, NUM);
+    }
+
+    public void outATextType(ATextType node){
+        addType(node, TEXT);
+    }
+
+    public void outAObjectType(AObjectType node){
+        addType(node, node.getId().getText());
+    }*/
+
+
 }
