@@ -16,10 +16,13 @@ public class TableFiller extends DepthFirstAdapter {
     public ArrayList<String> ErrorList;
 
     private Node node;
+    private LineAndPos lineAndPos;
+    private boolean dotCall = false;
 
-
-    public TableFiller(Node node){
+    public TableFiller(Node node, boolean dotCall, LineAndPos lineAndPos){
         this.node = node;
+        this.dotCall = dotCall;
+        this.lineAndPos = lineAndPos;
 
         symStack = new Stack<>();
         symbolTable = new Hashtable<>();
@@ -75,19 +78,28 @@ public class TableFiller extends DepthFirstAdapter {
     }
 
     public void outAVarPdcl(AVarPdcl node){
-        addSymbol(node.getId().getText(), node);
-        addType(node, node.getType().toString());
+        if(dotCall){
+            addSymbol(node.getId().getText(), node);
+            addType(node, node.getType().toString());
+        }
+
 
 
     }
 
     public void outAVarasgPdcl(AVarasgPdcl node){
-        addSymbol(node.getId().getText(), node);
-        addType(node, node.getType().toString());
+        if(dotCall){
+            addSymbol(node.getId().getText(), node);
+            addType(node, node.getType().toString());
+        }
+
     }
 
     public void outAListPdcl(AListPdcl node){
-        addSymbol(node.getId().getText(), node);
-        addType(node, node.getType().toString());
+        if(dotCall){
+            addSymbol(node.getId().getText(), node);
+            addType(node, node.getType().toString());
+        }
+
     }
 }

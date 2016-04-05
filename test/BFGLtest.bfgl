@@ -11,5 +11,6 @@ class Player begin
 end
 
 class Test begin
+    dcl num t to "Hello"
     dcl num g
 end
