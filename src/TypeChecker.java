@@ -253,11 +253,11 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAForupStmt(AForupStmt node){
         closeScope();
 
-        if(compareType(node.getExpr(), NUM)){
+        if(!compareType(node.getExpr(), NUM)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node.getExpr()) + " pos " + lineAndPos.getPos(node.getExpr()) + " : " + node.getExpr().toString() + ", is not of type " + NUM + ".");
         }
 
-        if(compareType(node.getId().getText(), NUM)){
+        if(!compareType(node.getId().getText(), NUM)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node.getId()) + " pos " + lineAndPos.getPos(node.getId()) + " : " + node.getId().toString() + ", is not of type " + NUM + ".");
         }
     }
@@ -269,10 +269,10 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAFordownStmt(AFordownStmt node){
         closeScope();
-        if(compareType(node.getExpr(), NUM)){
+        if(!compareType(node.getExpr(), NUM)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node.getExpr()) + " pos " + lineAndPos.getPos(node.getExpr()) + " : " + node.getExpr().toString() + ", is not of type " + NUM + ".");
         }
-        if(compareType(node.getId().getText(), NUM)){
+        if(!compareType(node.getId().getText(), NUM)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node.getId()) + " pos " + lineAndPos.getPos(node.getId()) + " : " + node.getId().toString() + ", is not of type " + NUM + ".");
         }
     }
@@ -285,7 +285,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAWhileStmt(AWhileStmt node){
         closeScope();
 
-        if(compareType(node.getExpr(), NUM)){
+        if(!compareType(node.getExpr(), NUM)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
         }
     }
@@ -298,7 +298,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAIfConditional(AIfConditional node){
         closeScope();
 
-        if(compareType(node.getExpr(), BOOL)){
+        if(!compareType(node.getExpr(), BOOL)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
         }
     }
@@ -320,7 +320,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAElseifBranch(AElseifBranch node){
         closeScope();
 
-        if(compareType(node.getExpr(), BOOL)){
+        if(!compareType(node.getExpr(), BOOL)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
         }
     }

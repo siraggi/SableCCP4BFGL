@@ -1,4 +1,3 @@
-                                                  /* Could use a global var for points                */
 Main begin
   dcl Player player to new Player(20) 
   dcl Ball ball to new Ball(20)

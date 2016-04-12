@@ -2,7 +2,7 @@ dcl num NumTest to 5 /*Here har vi vores global var */
 dcl bool BoolTest
 dcl text TextTest
 dcl someClass ClassTest
-                     /*du kan ogsaa lave c
+
 Main begin 
    dcl num NumTest to 5 
    dcl bool BoolTest
@@ -21,27 +21,28 @@ class SomeClass begin
       dcl bool BoolTest
       dcl text TextTest
       dcl someClass ClassTest
+      dcl num i to 1
 
-      set numTest to 5
+      set NumTest to 5
       set BoolTest to true
       set TextTest to "test"
       set ClassTest to new someClass()
 
       if point.y > ball.point.y then /* hvorfor virker dette */
       end
-      if some > somde then
+      if NumTest > 6 then
       end
 
-      for i upto something do
-         for i upto something do
+      for i upto 6 do
+         for i upto 6 do
             if point.y > ball.point.y then /* hvorfor virker dette */
             end
          end
       end
       
-      while i < something do
+      while i < 6 do
          while true do
-            if something = somethingelse then
+            if NumTest = 6 then
             else
             end
          end

@@ -1,6 +1,11 @@
 Main begin
     dcl Player p to new Player()
-    p.pol
+    dcl num i
+
+    for i upto 6 do
+        p.pol
+    end
+
 end
 
 class Player is TestClass begin
