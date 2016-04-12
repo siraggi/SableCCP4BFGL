@@ -1,23 +1,17 @@
 Main begin
     dcl Player p to new Player()
-    dcl num i to 5
     p.pol
 end
 
 class Player is TestClass begin
-    dcl Test t
-
-    dcl func h() begin
-
-    end
-
-    dcl func f(num d) begin
-
-        return "hello"
-    end
+    dcl num lop
 end
 
 class TestClass begin
     dcl num pol
 
+
+    dcl func q() begin
+        return f()
+    end
 end
