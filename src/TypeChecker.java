@@ -10,6 +10,8 @@ public class TypeChecker extends DepthFirstAdapter{
     private static final String BOOL = "bool";
     private static final String NUM = "num";
     private static final String TEXT = "text";
+    private static final String LIST = "List";
+    private static final String VOID = "void";
     //private static final String VECTOR = "vector";
     private static final String ERRORTYPE = "9";
     private LineAndPos lineAndPos;
@@ -105,27 +107,31 @@ public class TypeChecker extends DepthFirstAdapter{
                     tempNode = (AFuncPdcl) symStack.get(i - 1).get(id);
 
                     //Check if the function call is recursive
-                    if(!(tempNode.getId().getText().trim().equals(((AFuncCall)((ACallExpr)((AIdReturn)((AFuncBody)tempNode.getBody()).getReturn()).getExpr()).getCall()).getId().getText().trim())))
-                    {
-                        if (getNode(id) != null) {
-                            getNode(id).apply(typeChecker);
+                    if(((AFuncBody)tempNode.getBody()).getReturn() instanceof AIdReturn){
+                        if(!(tempNode.getId().getText().trim().equals(((AFuncCall)((ACallExpr)((AIdReturn)((AFuncBody)tempNode.getBody()).getReturn()).getExpr()).getCall()).getId().getText().trim())))
+                        {
+                            if (getNode(id) != null) {
+                                getNode(id).apply(typeChecker);
 
-                            typeTable.putAll(typeChecker.typeTable);
-                            ErrorList.addAll(typeChecker.ErrorList);
+                                typeTable.putAll(typeChecker.typeTable);
+                                ErrorList.addAll(typeChecker.ErrorList);
 
-                            if (symStack.get(i - 1).get(id).getClass().equals(AFuncPdcl.class)) {
-                                tempNode = (AFuncPdcl) symStack.get(i - 1).get(id);
+                                if (symStack.get(i - 1).get(id).getClass().equals(AFuncPdcl.class)) {
+                                    tempNode = (AFuncPdcl) symStack.get(i - 1).get(id);
 
-                                addType(tempNode, typeTable.get(tempNode.getBody()));
+                                    addType(tempNode, typeTable.get(tempNode.getBody()));
+                                }
+
+                                type = typeTable.get(symStack.get(i - 1).get(id));
                             }
-
-                            type = typeTable.get(symStack.get(i - 1).get(id));
                         }
-                    }
-                    else
-                        type = ERRORTYPE;
+                        else
+                            type = ERRORTYPE;
                         ErrorList.add("ERROR line " + lineAndPos.getLine(tempNode) + " pos " + lineAndPos.getPos(tempNode) + " : Recursive call not allowed.");
 
+                    }
+                    else
+                        type = VOID;
                 }
 
                 break;
@@ -351,7 +357,8 @@ public class TypeChecker extends DepthFirstAdapter{
 
     //List dcl
     public void outAListPdcl(AListPdcl node){
-        //addSymbol(node.getId().getText(), node, node.getType().toString());
+        addSymbol(node.getId().getText(), node, LIST);
+        superTable.put(node.getId().getText(), node.getType().toString().trim());
     }
 
     //Value types

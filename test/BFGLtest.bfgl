@@ -1,6 +1,13 @@
 Main begin
     dcl Player p to new Player()
+
+    dcl list of num ll
+
+    ll.add()
+
     dcl num i
+
+
 
     for i upto 6 do
         p.pol
@@ -19,4 +26,12 @@ class TestClass begin
     dcl func q() begin
         return f()
     end
+end
+
+class List begin
+
+    dcl func add() begin
+
+    end
+
 end
