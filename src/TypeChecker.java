@@ -19,12 +19,13 @@ public class TypeChecker extends DepthFirstAdapter{
     public Hashtable<Node, String> typeTable;
     public ArrayList<String> ErrorList;
 
-
+    private Hashtable<String, String> superTable;
 
 
     public TypeChecker(){
         symStack = new Stack<>();
         typeTable = new Hashtable<>();
+        superTable = new Hashtable<>();
         ErrorList = new ArrayList<>();
         lineAndPos = new LineAndPos();
     }
@@ -33,20 +34,36 @@ public class TypeChecker extends DepthFirstAdapter{
     private void openScope(Node node){
         TableFiller tf = new TableFiller(node, false, lineAndPos);
 
-        node.apply(tf);
+        if(node instanceof AClassPdcl){
+            if(((AClassPdcl)node).getInherit() != null){
+                openScope(getNode(((AInherit)((AClassPdcl)node).getInherit()).getType().toString()));
+            }
+        }
+
+        if(node != null)
+            node.apply(tf);
 
         symStack.push(tf.symStack.pop());
         typeTable.putAll(tf.typeTable);
+        superTable.putAll(tf.superTable);
         ErrorList.addAll(tf.ErrorList);
     }
 
     private void openScope(Node node, boolean dotCall){
         TableFiller tf = new TableFiller(node, dotCall, lineAndPos);
 
-        node.apply(tf);
+        if(node instanceof AClassPdcl){
+            if(((AClassPdcl)node).getInherit() != null){
+                openScope(getNode(((AInherit)((AClassPdcl)node).getInherit()).getType().toString()), dotCall);
+            }
+        }
+
+        if(node != null)
+            node.apply(tf);
 
         symStack.push(tf.symStack.pop());
         typeTable.putAll(tf.typeTable);
+        superTable.putAll(tf.superTable);
         ErrorList.addAll(tf.ErrorList);
     }
 
@@ -85,17 +102,20 @@ public class TypeChecker extends DepthFirstAdapter{
                     typeChecker.typeTable.putAll(typeTable);
                     typeChecker.symStack = symStack;
 
-                    getNode(id).apply(typeChecker);
+                    if(getNode(id) != null){
+                        getNode(id).apply(typeChecker);
 
-                    typeTable.putAll(typeChecker.typeTable);
-                    ErrorList.addAll(typeChecker.ErrorList);
+                        typeTable.putAll(typeChecker.typeTable);
+                        ErrorList.addAll(typeChecker.ErrorList);
 
-                    if(symStack.get(i-1).get(id).getClass().equals(AFuncPdcl.class)){
-                        tempNode = (AFuncPdcl)symStack.get(i-1).get(id);
-                        addType(tempNode, typeTable.get(tempNode.getBody()));
+                        if(symStack.get(i-1).get(id).getClass().equals(AFuncPdcl.class)){
+                            tempNode = (AFuncPdcl)symStack.get(i-1).get(id);
+                            addType(tempNode, typeTable.get(tempNode.getBody()));
+                        }
+
+                        type = typeTable.get(symStack.get(i-1).get(id));
                     }
 
-                    type = typeTable.get(symStack.get(i-1).get(id));
                 }
 
                 break;
@@ -119,6 +139,51 @@ public class TypeChecker extends DepthFirstAdapter{
 
         return null;
     }
+
+    private boolean compareType(Node node, String type){
+        String firstType = typeTable.get(node);
+        boolean notFinished = true;
+        boolean result = false;
+
+        while (notFinished){
+            if(firstType.equals(type.trim())){
+                notFinished = false;
+                result = true;
+            }
+            else if(superTable.get(firstType) == null){
+                notFinished = false;
+            }
+            else{
+                firstType = superTable.get(firstType);
+            }
+        }
+
+
+        return result;
+    }
+
+    private boolean compareType(String id, String type){
+        String firstType = getType(id);
+        boolean notFinished = true;
+        boolean result = false;
+
+        while (notFinished){
+            if(firstType.equals(type.trim())){
+                notFinished = false;
+                result = true;
+            }
+            else if(superTable.get(firstType) == null){
+                notFinished = false;
+            }
+            else{
+                firstType = superTable.get(firstType);
+            }
+        }
+
+
+        return result;
+    }
+
 
     //Visitor methods
 
@@ -177,6 +242,22 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAForupStmt(AForupStmt node){
         closeScope();
+
+        /*if(!typeTable.get(node.getExpr()).equals(NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getExpr()) + " pos " + lineAndPos.getPos(node.getExpr()) + " : " + node.getExpr().toString() + ", is not of type " + NUM + ".");
+        }
+
+        if(!getType(node.getId().getText()).equals(NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getId()) + " pos " + lineAndPos.getPos(node.getId()) + " : " + node.getId().toString() + ", is not of type " + NUM + ".");
+        }*/
+
+        if(compareType(node.getExpr(), NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getExpr()) + " pos " + lineAndPos.getPos(node.getExpr()) + " : " + node.getExpr().toString() + ", is not of type " + NUM + ".");
+        }
+
+        if(compareType(node.getId().getText(), NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getId()) + " pos " + lineAndPos.getPos(node.getId()) + " : " + node.getId().toString() + ", is not of type " + NUM + ".");
+        }
     }
 
     //For loop down
@@ -186,6 +267,14 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAFordownStmt(AFordownStmt node){
         closeScope();
+
+        if(!typeTable.get(node.getExpr()).equals(NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getExpr()) + " pos " + lineAndPos.getPos(node.getExpr()) + " : " + node.getExpr().toString() + ", is not of type " + NUM + ".");
+        }
+
+        if(!getType(node.getId().getText()).equals(NUM)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node.getId()) + " pos " + lineAndPos.getPos(node.getId()) + " : " + node.getId().toString() + ", is not of type " + NUM + ".");
+        }
     }
 
     //While loop
@@ -195,6 +284,10 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAWhileStmt(AWhileStmt node){
         closeScope();
+
+        if(!typeTable.get(node.getExpr()).equals(BOOL)){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
+        }
     }
 
     //If
@@ -247,7 +340,7 @@ public class TypeChecker extends DepthFirstAdapter{
 
     //Var asg dcl
     public void outAVarasgPdcl(AVarasgPdcl node){
-        if(!typeTable.get(node.getExpr()).trim().equals(node.getType().toString().trim())){
+        if(!compareType(node.getExpr(), node.getType().toString().trim())){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + node.getType() + ".");
             addType(node, ERRORTYPE);
         }
@@ -320,7 +413,13 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAClassCall(AClassCall node){
         Node n = node.getRest().getLast();
-        addType(node, getType(n.toString().trim()));
+
+
+        if(n instanceof AFuncCall)
+            addType(node, getType(((AFuncCall)n).getId().getText()));
+        else
+            addType(node, getType((n.toString().trim())));
+
         closeScope();
 
         for (int i = 0; i < node.getRest().size() - 1; i++){
@@ -329,6 +428,20 @@ public class TypeChecker extends DepthFirstAdapter{
     }
 
     public void outAFuncCall(AFuncCall node){
+        AFuncPdcl dcl = (AFuncPdcl) getNode(node.getId().getText());
+
+        if(dcl != null) {
+            if (node.getParams().size() != dcl.getParams().size()) {
+                ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getId().getText() + ", takes " + dcl.getParams().size() + " not " + node.getParams().size() + ".");
+            }
+            else
+                for (int i = 0; i < node.getParams().size(); i++) {
+                    if (!(typeTable.get(node.getParams().get(i)).equals(((AFormalParam)dcl.getParams().get(i)).getType().toString().trim()))) {
+                        ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : parameter " + i + " is not of type " + ((AFormalParam)dcl.getParams().get(i)).getType().toString().trim() + ".");
+                    }
+                }
+        }
+
         addType(node, getType(node.getId().getText()));
     }
 
@@ -581,7 +694,11 @@ public class TypeChecker extends DepthFirstAdapter{
 
     //Inherit
     public void outAInherit(AInherit node){
-        //Implement later
+        Node n = getNode(node.getType().toString().trim());
+
+        if(n == null){
+            ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : No declaration for " + node.getType().toString().trim() + ".");
+        }
     }
 
 

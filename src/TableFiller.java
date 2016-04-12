@@ -14,6 +14,7 @@ public class TableFiller extends DepthFirstAdapter {
     public Hashtable<String, Node> symbolTable;
     public Hashtable<Node, String> typeTable;
     public ArrayList<String> ErrorList;
+    public Hashtable<String, String> superTable;
 
     private Node node;
     private LineAndPos lineAndPos;
@@ -27,6 +28,7 @@ public class TableFiller extends DepthFirstAdapter {
         symStack = new Stack<>();
         symbolTable = new Hashtable<>();
         typeTable = new Hashtable<>();
+        superTable = new Hashtable<>();
         ErrorList = new ArrayList<>();
 
         symStack.push(new Hashtable<String, Node>());
@@ -63,6 +65,9 @@ public class TableFiller extends DepthFirstAdapter {
             closeScope();
             addSymbol(node.getId().getText(), node);
             addType(node, node.getId().getText());
+
+            if(node.getInherit() != null)
+                superTable.put(node.getId().getText().trim(), ((AInherit)node.getInherit()).getType().toString().trim());
         }
 
     }

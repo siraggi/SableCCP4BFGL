@@ -1,16 +1,23 @@
 Main begin
     dcl Player p to new Player()
-    if 5 = 5 then
-        p.t.g
+    dcl num i to 5
+    p.pol
+end
+
+class Player is TestClass begin
+    dcl Test t
+
+    dcl func h() begin
+
+    end
+
+    dcl func f(num d) begin
+
+        return "hello"
     end
 end
 
-class Player begin
-    dcl Test t
+class TestClass begin
+    dcl num pol
 
-end
-
-class Test begin
-    dcl num t to "Hello"
-    dcl num g
 end

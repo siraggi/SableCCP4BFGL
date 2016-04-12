@@ -71,7 +71,7 @@ Productions
 
     maindcl     {-> pdcl}   =   {maindcl} main begin newline stmt* end           {-> New pdcl.main([stmt.stmt])};
 
-    classdcl    {-> pdcl}   =   {classdcl} [b]:newline eclass id inherit? begin [a]:newline classbody* end    {-> New pdcl.class(id, [classbody.body])};
+    classdcl    {-> pdcl}   =   {classdcl} [b]:newline eclass id inherit? begin [a]:newline classbody* end    {-> New pdcl.class(id, [classbody.body], inherit.inherit)};
 
     classbody   {-> body}   =   {dcl} vardcl newline                                                            {-> New body.class(vardcl.pdcl)}
                             |   {eventdcl} eventdcl newline                                                     {-> New body.eventdcl(eventdcl.pdcl)}
@@ -177,7 +177,7 @@ Abstract Syntax Tree
     pdcl        =   {var} type id
                 |   {varasg} type id expr
                 |   {list} type id
-                |   {class} id body*
+                |   {class} id body* inherit?
                 |   {main} stmt*
                 |   {event} id [params]:param* [body]:stmt*
                 |   {func} id [params]:param* body;
