@@ -108,7 +108,13 @@ public class TypeChecker extends DepthFirstAdapter{
 
                     //Check if the function call is recursive
                     if(((AFuncBody)tempNode.getBody()).getReturn() instanceof AIdReturn){
-                        if(!(tempNode.getId().getText().trim().equals(((AFuncCall)((ACallExpr)((AIdReturn)((AFuncBody)tempNode.getBody()).getReturn()).getExpr()).getCall()).getId().getText().trim())))
+                        RecursiveCheck rc = new RecursiveCheck(tempNode);
+                        tempNode.apply(rc);
+
+                        //if(!(tempNode.getId().getText().trim().equals(((AFuncCall)((ACallExpr)((AIdReturn)((AFuncBody)tempNode.getBody()).getReturn()).getExpr()).getCall()).getId().getText().trim())))
+
+
+                        if(!rc.isRecursive)
                         {
                             if (getNode(id) != null) {
                                 getNode(id).apply(typeChecker);
@@ -117,7 +123,7 @@ public class TypeChecker extends DepthFirstAdapter{
                                 ErrorList.addAll(typeChecker.ErrorList);
 
                                 if (symStack.get(i - 1).get(id).getClass().equals(AFuncPdcl.class)) {
-                                    tempNode = (AFuncPdcl) symStack.get(i - 1).get(id);
+                                    tempNode = (AFuncPdcl) symStack.get(i - 1).get(id); // er det nødvendigt
 
                                     addType(tempNode, typeTable.get(tempNode.getBody()));
                                 }
@@ -291,7 +297,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public void outAWhileStmt(AWhileStmt node){
         closeScope();
 
-        if(!compareType(node.getExpr(), NUM)){
+        if(!compareType(node.getExpr(), BOOL)){
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : " + node.getExpr().toString() + ", is not of type " + BOOL + ".");
         }
     }
@@ -425,7 +431,7 @@ public class TypeChecker extends DepthFirstAdapter{
         if(n instanceof AFuncCall)
             addType(node, getType(((AFuncCall)n).getId().getText()));
         else
-            addType(node, getType((n.toString().trim())));
+            addType(node, getType(n.toString().trim()));
 
         closeScope();
 

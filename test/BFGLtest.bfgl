@@ -24,7 +24,7 @@ class TestClass begin
 
 
     dcl func q() begin
-        return f()
+        return 5 / q()
     end
 end
 
