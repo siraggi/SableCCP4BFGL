@@ -3,6 +3,8 @@ import grammar.ini.lexer.LexerException;
 import grammar.ini.node.Start;
 import grammar.ini.parser.Parser;
 import grammar.ini.parser.ParserException;
+
+import javax.xml.transform.ErrorListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,13 +23,12 @@ public class Main {
         Start tree = parser.parse();
         tree.apply(typeChecker);
 
+        if(typeChecker.ErrorList.isEmpty()){
+            typeChecker.ErrorList.forEach(System.out::println);
+            return;
+        }
 
-        for (String s: typeChecker.ErrorList)
-            System.out.println(s);
-
-        //System.out.println("CSTTree..........\n" + tree.toString());
-
-
-
+        CodeGenerator codeGenerator = new CodeGenerator(typeChecker.typeTable, typeChecker.superTable);
+        tree.apply(codeGenerator);
     }
 }

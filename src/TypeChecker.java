@@ -20,7 +20,7 @@ public class TypeChecker extends DepthFirstAdapter{
     public Hashtable<Node, String> typeTable;
     public ArrayList<String> ErrorList;
 
-    private Hashtable<String, String> superTable;
+    public Hashtable<String, String> superTable;
 
 
     public TypeChecker(){
