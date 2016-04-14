@@ -12,7 +12,6 @@ public class TypeChecker extends DepthFirstAdapter{
     private static final String TEXT = "text";
     private static final String LIST = "List";
     private static final String VOID = "void";
-    //private static final String VECTOR = "vector";
     private static final String ERRORTYPE = "9";
     private LineAndPos lineAndPos;
 
@@ -110,9 +109,6 @@ public class TypeChecker extends DepthFirstAdapter{
                     if(((AFuncBody)tempNode.getBody()).getReturn() instanceof AIdReturn){
                         RecursiveCheck rc = new RecursiveCheck(tempNode);
                         tempNode.apply(rc);
-
-                        //if(!(tempNode.getId().getText().trim().equals(((AFuncCall)((ACallExpr)((AIdReturn)((AFuncBody)tempNode.getBody()).getReturn()).getExpr()).getCall()).getId().getText().trim())))
-
 
                         if(!rc.isRecursive)
                         {
@@ -241,7 +237,6 @@ public class TypeChecker extends DepthFirstAdapter{
 
     public void outAClassPdcl(AClassPdcl node){
         closeScope();
-        //addSymbol(node.getId().getText(), node, node.getId().getText());
     }
 
     //Function dcl
@@ -713,24 +708,4 @@ public class TypeChecker extends DepthFirstAdapter{
             ErrorList.add("ERROR line " + lineAndPos.getLine(node) + " pos " + lineAndPos.getPos(node) + " : No declaration for " + node.getType().toString().trim() + ".");
         }
     }
-
-
-    //Type - Not necessary
-    /*public void outABoolType(ABoolType node){
-        addType(node, BOOL);
-    }
-
-    public void outANumType(ANumType node){
-        addType(node, NUM);
-    }
-
-    public void outATextType(ATextType node){
-        addType(node, TEXT);
-    }
-
-    public void outAObjectType(AObjectType node){
-        addType(node, node.getId().getText());
-    }*/
-
-
 }
