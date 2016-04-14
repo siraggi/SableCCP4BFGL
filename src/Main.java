@@ -4,7 +4,6 @@ import grammar.ini.node.Start;
 import grammar.ini.parser.Parser;
 import grammar.ini.parser.ParserException;
 
-import javax.xml.transform.ErrorListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,12 +22,12 @@ public class Main {
         Start tree = parser.parse();
         tree.apply(typeChecker);
 
-        if(typeChecker.ErrorList.isEmpty()){
+        if(!typeChecker.ErrorList.isEmpty()){
             typeChecker.ErrorList.forEach(System.out::println);
-            return;
         }
-
-        CodeGenerator codeGenerator = new CodeGenerator(typeChecker.typeTable, typeChecker.superTable);
-        tree.apply(codeGenerator);
+        else{
+            JavaCodeGenerator javaCodeGenerator = new JavaCodeGenerator(typeChecker.typeTable, typeChecker.superTable);
+            tree.apply(javaCodeGenerator);
+        }
     }
 }
