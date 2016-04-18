@@ -26,19 +26,26 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
         }
         fw = new FileWriter(file.getAbsoluteFile());
         bw = new BufferedWriter(fw);
+        emit("hej ");
+        emit("hejhejehej");
     }
 
     //emitfunctions
     private void emit(String s){
 
         try {
-            bw.write("Hej");
+            bw.write(s + "\\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     private void emitComment(String s){
+        try {
 
+            bw.write("//" + s + "\\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     private void skip(int i){
 
@@ -51,8 +58,12 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
 
     }
 
-    public void outAProg(AProg node) throws IOException {
-        bw.close();
+    public void outAProg(AProg node) {
+        try {
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //main
