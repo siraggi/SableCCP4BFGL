@@ -58,7 +58,7 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
 
     }
 
-    public void outAProg(AProg node) {
+    public void outAProg(AProg node){
         try {
             bw.close();
         } catch (IOException e) {
