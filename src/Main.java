@@ -23,7 +23,10 @@ public class Main {
         tree.apply(typeChecker);
 
         if(!typeChecker.ErrorList.isEmpty()){
-            typeChecker.ErrorList.forEach(System.out::println);
+            for (String s:
+            typeChecker.ErrorList){
+                System.out.println(s);
+            }
         }
         else{
             JavaCodeGenerator javaCodeGenerator = new JavaCodeGenerator(typeChecker.typeTable, typeChecker.superTable);

@@ -51,8 +51,12 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
 
     }
 
-    public void outAProg(AProg node) throws IOException {
-        bw.close();
+    public void outAProg(AProg node){
+        try {
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //main
