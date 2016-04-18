@@ -22,10 +22,14 @@ end
 class TestClass begin
     dcl num pol
 
+        dcl func g(num i , num ii , num iii) begin
+            set pol to 5
+        end
 
-    dcl func q() begin
-        return 5 / 7
-    end
+        dcl func q() begin
+            dcl text t to "Hello"
+            g(1, 1, 1)
+        end
 end
 
 class List begin

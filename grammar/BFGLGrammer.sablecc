@@ -153,8 +153,8 @@ Productions
     actualparam {-> expr*}  =   {singleparam} bexpr                                     {-> [bexpr.expr]}
                             |   {mulparam} bexpr comma [rest]:actualparam               {-> [bexpr.expr, rest.expr]};
 
-    formalparam {-> param}  =   {singleparam} type id                                   {-> New param.formal(type.type, id, [])}
-                            |   {mulparam} type id comma formalparam                    {-> New param.formal(type.type, id, [formalparam.param])};
+    formalparam {-> param*}  =   {singleparam} type id                                  {-> [New param.formal(type.type, id)]}
+                            |   {mulparam} type id comma formalparam                    {-> [New param.formal(type.type, id), formalparam.param]};
 
     classcall   {-> call}   =   {mulcall} singlecall dot multicall                               {-> New call.class(singlecall.call, [multicall.call])}
                             |   {single} funccall                                       {-> funccall.call};
@@ -189,7 +189,8 @@ Abstract Syntax Tree
     return      =   {id} expr
                 |   {empty} ;
 
-    param       =   {formal} type id param*;
+    param       =   {multi} param*
+                |   {formal} type id;
 
     inherit     =   type;
 
