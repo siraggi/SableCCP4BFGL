@@ -34,7 +34,8 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
     private void emit(String s){
 
         try {
-            bw.write(s + "\\n");
+            bw.write(s);
+            bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,7 +43,8 @@ public class JavaCodeGenerator extends DepthFirstAdapter {
     private void emitComment(String s){
         try {
 
-            bw.write("//" + s + "\\n");
+            bw.write("//" + s);
+            bw.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
