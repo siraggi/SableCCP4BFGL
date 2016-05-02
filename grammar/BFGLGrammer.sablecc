@@ -26,6 +26,8 @@ Tokens
     and = 'and';
     set = 'set';
     dcl = 'dcl';
+    this = 'this';
+    tbase = 'base';
     of = 'of';
     to = 'to';
     new = 'new';
@@ -145,10 +147,11 @@ Productions
     val         {-> val}    =   {numliteral} numval                                     {-> New val.num(numval)}
                             |   {textliteral} textval                                   {-> New val.text(textval)}
                             |   {boolliteral} boolval                                   {-> New val.bool(boolval)}
+                            |   {this} this                                             {-> New val.this(this)}
                             |   {newobject} new id lparen actualparam? rparen           {-> New val.constr(id, [actualparam.expr])};
 
     funccall    {-> call}   =   {singlefunc} id lparen actualparam? rparen              {-> New call.func(id, [actualparam.expr])};
-                    //        |   {nestedfunc} eclass id lparen actualparam? rparen dot funccall {-> New call.funcmulti(id, [actualparam.expr], funccall.call)};
+
 
     actualparam {-> expr*}  =   {singleparam} bexpr                                     {-> [bexpr.expr]}
                             |   {mulparam} bexpr comma [rest]:actualparam               {-> [bexpr.expr, rest.expr]};
@@ -162,13 +165,14 @@ Productions
     singlecall  {-> call}   =   {idcall} id                                             {-> New call.var(id)}
                             |   {funccall} funccall                                     {-> funccall.call};
 
-    multicall   {-> call*}  =   {signle} singlecall                                     {-> [singlecall.call]}
+    multicall   {-> call*}  =   {single} singlecall                                     {-> [singlecall.call]}
                             |   {multi} singlecall dot [rest]:multicall                 {-> [singlecall.call, rest.call]};
 
     inherit     {-> inherit}    =    is type                                            {-> New inherit(type)};
 
-    eventdcl    {-> pdcl}  =   id lparen formalparam* rparen do newline [body]:stmt* end          {-> New pdcl.event(id, [formalparam.param], [body.stmt])};
+    eventdcl    {-> pdcl}   =   id lparen formalparam* rparen do newline baseconstr? [body]:stmt* end          {-> New pdcl.event(id, [formalparam.param], baseconstr.base, [body.stmt])};
 
+    baseconstr  {-> base}   =   tbase lparen actualparam? rparen newline                {-> New base.base([actualparam.expr])};
 
 Abstract Syntax Tree
 
@@ -179,7 +183,7 @@ Abstract Syntax Tree
                 |   {list} type id
                 |   {class} id body* inherit?
                 |   {main} stmt*
-                |   {event} id [params]:param* [body]:stmt*
+                |   {event} id [params]:param* base? [body]:stmt*
                 |   {func} id [params]:param* body;
 
     body        =   {func} stmt* return
@@ -191,6 +195,8 @@ Abstract Syntax Tree
 
     param       =   {multi} param*
                 |   {formal} type id;
+
+    base        =   {base} [params]:expr*;
 
     inherit     =   type;
 
@@ -226,6 +232,7 @@ Abstract Syntax Tree
     val         =   {num} numval
                 |   {text} textval
                 |   {bool} boolval
+                |   {this} this
                 |   {constr} id [param]:expr*;
 
     stmt        =   {vardcl} pdcl
